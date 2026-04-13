@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
-    return send_from_directory('images', filename)
+    return send_from_directory(os.path.join(app.root_path, 'images'), filename)
 
 @app.route('/')
 def index():
