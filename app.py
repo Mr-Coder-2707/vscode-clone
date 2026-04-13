@@ -6,11 +6,19 @@ from semantic import SemanticAnalyzer
 from ir import IRGenerator
 from codegen import CodeGenerator
 
-app = Flask(__name__, static_url_path='/images', static_folder='images')
+app = Flask(__name__)
+
+@app.route('/images/<path:filename>')
+def serve_image(filename):
+    return send_from_directory('images', filename)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/editor')
+def editor():
+    return render_template('editor.html')
 
 @app.route('/compile', methods=['POST'])
 def compile_code():

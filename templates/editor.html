@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mini Compiler - VSC Edition</title>
+    <!-- PWA Requirements -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#323233">
+    <link rel="apple-touch-icon" href="/images/visual-studio-code-1.svg">
+    <!-- Add Favicon -->
+    <link rel="icon" href="/images/visual-studio-code-1.svg" type="image/svg+xml">
+    <!-- Add Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/editor.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <img src="/images/visual-studio-code-1.svg" alt="Loading Logo">
+        <div class="loading-text">LOADING EXPLORER...</div>
+    </div>
+
+    <div id="titlebar">
+        <div class="logo">
+            <a href="/" onclick="localStorage.removeItem('skipLanding');" title="Back to Landing Page" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="/images/visual-studio-code-1.svg" alt="Logo" style="width: 16px; height: 16px; margin-right: 8px;">
+                Mini Compiler
+            </a>
+        </div>
+        <div class="menus">
+            <span>File</span>
+            <span>Edit</span>
+            <span>View</span>
+            <span>Run</span>
+            <span id="install-pwa-btn" style="display: none; cursor: pointer; color: #007fd4; font-weight: bold; align-items: center; gap: 4px;">
+                <i class="material-icons-round" style="font-size: 14px;">download</i> Install App
+            </span>
+        </div>
+        <div class="theme-controls" style="margin-left: auto; display: flex; gap: 10px; margin-right: 15px; align-items: center;">
+            <select id="theme-selector" style="background: var(--vsc-bg); color: var(--vsc-text); border: 1px solid var(--vsc-border); padding: 4px; border-radius: 4px; font-family: inherit; font-size: 13px; outline: none;" onchange="changeTheme(this.value)">
+                <option value="vs-dark">Dark+ (Default Dark)</option>
+                <option value="vs">Light+ (Default Light)</option>
+                <option value="hc-black">High Contrast Black</option>
+                <option value="hc-light">High Contrast Light</option>
+                <option value="monokai">Monokai</option>
+                <option value="dracula">Dracula</option>
+                <option value="github-dark">GitHub Dark</option>
+                <option value="github-light">GitHub Light</option>
+                <option value="solarized-dark">Solarized Dark</option>
+                <option value="solarized-light">Solarized Light</option>
+                <option value="synthwave">SynthWave '84</option>
+                <option value="ayu-dark-gold">Ayu Dark Gold</option>
+            </select>
+            
+            <!-- Toggle Switch for Set Default Theme -->
+            <label class="switch" title="Toggle to set as Default Theme">
+                <input type="checkbox" id="toggle-default-theme" onchange="toggleDefaultTheme()">
+                <span class="slider"></span>
+            </label>
+            <label for="toggle-default-theme" class="toggle-label" title="Set as Default">Set Default</label>
+        </div>
+    </div>
+
+    <div id="main-layout">
+        <div id="activity-bar">
+            <div class="activity-icon active" title="Explorer"><span class="material-icons-round">description</span></div>
+            <div class="activity-icon" title="Search"><span class="material-icons-round">search</span></div>
+            <div class="activity-icon" title="Source Control"><span class="material-icons-round">source</span></div>
+            <div class="activity-icon" title="Run and Debug"><span class="material-icons-round">play_arrow</span></div>
+            <div class="activity-icon" title="Extensions"><span class="material-icons-round">extension</span></div>
+            <div style="flex-grow:1"></div>
+            <div class="activity-icon" title="Settings"><span class="material-icons-round">settings</span></div>
+        </div>
+
+        <div id="sidebar">
+            <div class="sidebar-title">EXPLORER</div>
+            <div class="sidebar-section">
+                <div class="section-header"><span class="material-icons-round">keyboard_arrow_down</span> EXAMPLES</div>
+                <ul class="file-list" id="example-list"></ul>
+            </div>
+        </div>
+
+        <!-- Sidebar Resizer Handle -->
+        <div id="sidebar-resizer"></div>
+
+        <div id="editor-area">
+            <div id="editor-tabs">
+                <div class="editor-tab"><span class="material-icons-round" style="color: #4B8BBE;">code</span> main.py</div>
+                <div class="run-actions">
+                    <button class="btn btn-run" onclick="compileCode()"><span class="material-icons-round">play_arrow</span> Compile</button>
+                </div>
+            </div>
+
+            <div id="monaco-container"></div>
+
+            <!-- Panel Resizer Handle -->
+            <div id="panel-resizer"></div>
+
+            <div id="bottom-panel">
+                <div id="panel-tabs">
+                    <div class="panel-tab" onclick="switchPanelTab('output')">OUTPUT</div>
+                    <div class="panel-tab active" onclick="switchPanelTab('tokens')">TOKENS</div>
+                    <div class="panel-tab" onclick="switchPanelTab('ast')">AST</div>
+                    <div class="panel-tab" onclick="switchPanelTab('semantic')">SEMANTIC</div>
+                    <div class="panel-tab" onclick="switchPanelTab('ir')">IR</div>
+                    <div class="panel-tab" onclick="switchPanelTab('assembly')">ASSEMBLY</div>
+                    <div id="panel-actions">
+                        <span class="material-icons-round" onclick="clearPanel()" title="Clear Output">clear_all</span>
+                        <span class="material-icons-round" onclick="togglePanel()" title="Toggle Panel">vertical_align_bottom</span>
+                    </div>
+                </div>
+                <div id="panel-content">
+                    <div id="tab-output" class="panel-content-inner">Ready...</div>
+                    <div id="tab-tokens" class="panel-content-inner active">Tokens...</div>
+                    <div id="tab-ast" class="panel-content-inner">AST...</div>
+                    <div id="tab-semantic" class="panel-content-inner">Semantic...</div>
+                    <div id="tab-ir" class="panel-content-inner">IR...</div>
+                    <div id="tab-assembly" class="panel-content-inner">Assembly...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="statusbar">
+        <div class="status-left">
+            <div class="status-item" style="background:var(--vsc-accent); padding: 0 10px; margin-left:-10px;"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">code</span> ><</div>
+            <div class="status-item">main.py*</div>
+            <div class="status-item"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">cancel</span> 0 <span class="material-icons-round" style="font-size:14px; margin-left:4px; margin-right:4px;">warning</span> 0</div>
+            <div class="status-item" id="compilation-status">Ready</div>
+        </div>
+        <div class="status-right">
+            <div class="status-item" id="cursor-position">Ln 1, Col 1</div>
+            <div class="status-item">Python</div>
+        </div>
+    </div>
+
+    <div id="context-menu">
+        <div class="context-item" id="menu-rename">Rename</div>
+        <div class="context-item" id="menu-delete">Delete</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+    <script src="/static/js/editor.js"></script>
+</body>
+</html>

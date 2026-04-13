@@ -2,7 +2,7 @@
   "name": "Mini Compiler VSC",
   "short_name": "Compiler",
   "description": "Mini Compiler with a VS Code like interface",
-  "start_url": "/",
+  "start_url": "/editor",
   "display": "standalone",
   "background_color": "#1e1e1e",
   "theme_color": "#323233",

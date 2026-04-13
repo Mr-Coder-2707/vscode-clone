@@ -1,6 +1,7 @@
-const CACHE_NAME = 'compiler-v1';
+const CACHE_NAME = 'compiler-v2';
 const ASSETS_TO_CACHE = [
     '/',
+    '/editor',
     '/manifest.json',
     '/images/visual-studio-code-1.svg',
     'https://fonts.googleapis.com/icon?family=Material+Icons+Round'
