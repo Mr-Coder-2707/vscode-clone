@@ -67,20 +67,78 @@
 
     <div id="main-layout">
         <div id="activity-bar">
-            <div class="activity-icon active" title="Explorer"><span class="material-icons-round">description</span></div>
-            <div class="activity-icon" title="Search"><span class="material-icons-round">search</span></div>
-            <div class="activity-icon" title="Source Control"><span class="material-icons-round">source</span></div>
-            <div class="activity-icon" title="Run and Debug"><span class="material-icons-round">play_arrow</span></div>
-            <div class="activity-icon" title="Extensions"><span class="material-icons-round">extension</span></div>
+            <div class="activity-icon active" title="Explorer" onclick="switchSidebar('explorer', this)"><span class="material-icons-round">description</span></div>
+            <div class="activity-icon" title="Search" onclick="switchSidebar('search', this)"><span class="material-icons-round">search</span></div>
+            <div class="activity-icon" title="Source Control" onclick="switchSidebar('source-control', this)"><span class="material-icons-round">source</span></div>
+            <div class="activity-icon" title="Run and Debug" onclick="switchSidebar('run-debug', this)"><span class="material-icons-round">play_arrow</span></div>
+            <div class="activity-icon" title="Extensions" onclick="switchSidebar('extensions', this)"><span class="material-icons-round">extension</span></div>
             <div style="flex-grow:1"></div>
-            <div class="activity-icon" title="Settings"><span class="material-icons-round">settings</span></div>
+            <div class="activity-icon" title="Settings" onclick="switchSidebar('settings', this)"><span class="material-icons-round">settings</span></div>
         </div>
 
         <div id="sidebar">
-            <div class="sidebar-title">EXPLORER</div>
-            <div class="sidebar-section">
-                <div class="section-header"><span class="material-icons-round">keyboard_arrow_down</span> EXAMPLES</div>
-                <ul class="file-list" id="example-list"></ul>
+            <div id="sidebar-explorer" class="sidebar-pane">
+                <div class="sidebar-title">EXPLORER</div>
+                <div class="sidebar-section">
+                    <div class="section-header"><span class="material-icons-round">keyboard_arrow_down</span> EXAMPLES</div>
+                    <ul class="file-list" id="example-list"></ul>
+                </div>
+            </div>
+
+            <!-- Search Pane -->
+            <div id="sidebar-search" class="sidebar-pane" style="display: none;">
+                <div class="sidebar-title">SEARCH</div>
+                <div style="padding: 10px;">
+                    <div style="background: var(--vsc-bg); border: 1px solid var(--vsc-border); display: flex; align-items: center; padding: 2px;">
+                        <span class="material-icons-round" style="font-size: 16px; opacity: 0.6; margin-right: 4px;">search</span>
+                        <input type="text" placeholder="Search" style="width: 100%; background: transparent; border: none; color: var(--vsc-text); outline: none; font-size: 13px;">
+                    </div>
+                    <div style="margin-top:20px; font-size:12px; color:var(--vsc-text); opacity:0.6; text-align:center;">
+                        Search your project files
+                    </div>
+                </div>
+            </div>
+
+            <!-- Source Control Pane -->
+            <div id="sidebar-source-control" class="sidebar-pane" style="display: none;">
+                <div class="sidebar-title">SOURCE CONTROL</div>
+                <div style="padding: 10px; color: var(--vsc-text); font-size: 13px;">
+                    <div style="margin-bottom: 10px; opacity: 0.8;">No source control providers registered.</div>
+                    <button style="background: var(--vsc-accent); color: white; border: none; padding: 6px; width: 100%; cursor: pointer; border-radius: 2px;">Initialize Repository</button>
+                </div>
+            </div>
+
+            <!-- Run and Debug Pane -->
+            <div id="sidebar-run-debug" class="sidebar-pane" style="display: none;">
+                <div class="sidebar-title">RUN AND DEBUG</div>
+                <div style="padding: 10px;">
+                    <button onclick="simulateCMDRun()" style="background: var(--vsc-accent); color: white; border: none; padding: 6px; width: 100%; cursor: pointer; border-radius: 2px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <span class="material-icons-round" style="font-size: 16px;">play_arrow</span> Run and Debug
+                    </button>
+                    <div style="color: var(--vsc-text); font-size: 12px; margin-top: 15px; opacity: 0.8; line-height: 1.5;">
+                        To customize Run and Debug, create a <a href="#" style="color: var(--vsc-accent); text-decoration: none;">launch.json</a> file.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extensions Pane -->
+            <div id="sidebar-extensions" class="sidebar-pane" style="display: none;">
+                <div class="sidebar-title">EXTENSIONS</div>
+                <div style="padding: 10px;">
+                    <div style="background: var(--vsc-bg); border: 1px solid var(--vsc-border); display: flex; align-items: center; padding: 2px;">
+                        <input type="text" placeholder="Search Extensions in Marketplace" style="width: 100%; background: transparent; border: none; color: var(--vsc-text); outline: none; font-size: 13px;">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Pane -->
+            <div id="sidebar-settings" class="sidebar-pane" style="display: none;">
+                <div class="sidebar-title">SETTINGS</div>
+                <div style="padding: 10px;">
+                    <div style="color: var(--vsc-text); font-size: 13px; opacity: 0.8; line-height: 1.5;">
+                        Configure your editor environment.
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -108,18 +166,52 @@
                     <div class="panel-tab" onclick="switchPanelTab('semantic')">SEMANTIC</div>
                     <div class="panel-tab" onclick="switchPanelTab('ir')">IR</div>
                     <div class="panel-tab" onclick="switchPanelTab('assembly')">ASSEMBLY</div>
+                    <div class="panel-tab" onclick="switchPanelTab('terminal')">TERMINAL</div>
                     <div id="panel-actions">
                         <span class="material-icons-round" onclick="clearPanel()" title="Clear Output">clear_all</span>
                         <span class="material-icons-round" onclick="togglePanel()" title="Toggle Panel">vertical_align_bottom</span>
                     </div>
                 </div>
                 <div id="panel-content">
-                    <div id="tab-output" class="panel-content-inner">Ready...</div>
-                    <div id="tab-tokens" class="panel-content-inner active">Tokens...</div>
-                    <div id="tab-ast" class="panel-content-inner">AST...</div>
-                    <div id="tab-semantic" class="panel-content-inner">Semantic...</div>
-                    <div id="tab-ir" class="panel-content-inner">IR...</div>
-                    <div id="tab-assembly" class="panel-content-inner">Assembly...</div>
+                    <div id="tab-output" class="panel-content-inner">
+                        <div class="empty-state">
+                            <span class="material-icons-round" style="font-size:48px; color:var(--vsc-border); margin-bottom:10px;">terminal</span>
+                            <div>Output will appear here</div>
+                        </div>
+                    </div>
+                    <div id="tab-tokens" class="panel-content-inner active">
+                        <div class="empty-state">
+                            <span class="material-icons-round" style="font-size:48px; color:var(--vsc-border); margin-bottom:10px;">data_object</span>
+                            <div>Lexical tokens will be generated here</div>
+                        </div>
+                    </div>
+                    <div id="tab-ast" class="panel-content-inner">
+                        <div class="empty-state">
+                            <span class="material-icons-round" style="font-size:48px; color:var(--vsc-border); margin-bottom:10px;">account_tree</span>
+                            <div>Abstract Syntax Tree (AST) visualization</div>
+                        </div>
+                    </div>
+                    <div id="tab-semantic" class="panel-content-inner">
+                        <div class="empty-state">
+                            <span class="material-icons-round" style="font-size:48px; color:var(--vsc-border); margin-bottom:10px;">rule</span>
+                            <div>Semantic analysis results</div>
+                        </div>
+                    </div>
+                    <div id="tab-ir" class="panel-content-inner">
+                        <div class="empty-state">
+                            <span class="material-icons-round" style="font-size:48px; color:var(--vsc-border); margin-bottom:10px;">integration_instructions</span>
+                            <div>Intermediate Representation (IR)</div>
+                        </div>
+                    </div>
+                    <div id="tab-assembly" class="panel-content-inner">
+                        <div class="empty-state">
+                            <span class="material-icons-round" style="font-size:48px; color:var(--vsc-border); margin-bottom:10px;">memory</span>
+                            <div>Generated Assembly Code</div>
+                        </div>
+                    </div>
+                    <div id="tab-terminal" class="panel-content-inner" style="font-family: 'Courier New', Courier, monospace; padding: 10px;">
+                        <div id="terminal-output"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,5 +237,110 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
     <script src="/static/js/editor.js"></script>
+    <script>
+        function switchSidebar(paneId, iconElement) {
+            // Manage icons active state
+            document.querySelectorAll('.activity-icon').forEach(icon => {
+                icon.classList.remove('active');
+            });
+            if (iconElement) {
+                iconElement.classList.add('active');
+            }
+
+            // Hide all sidebar panes
+            document.querySelectorAll('.sidebar-pane').forEach(pane => {
+                pane.style.display = 'none';
+            });
+
+            // Show selected pane
+            const activePane = document.getElementById('sidebar-' + paneId);
+            if (activePane) {
+                activePane.style.display = 'block';
+            }
+        }
+
+        async function simulateCMDRun() {
+            // Open the Bottom panel Terminal tab
+            if (typeof switchPanelTab === 'function') {
+                switchPanelTab('terminal');
+                // Ensure the bottom panel is visible (in case it is collapsed)
+                const bottomPanel = document.getElementById('bottom-panel');
+                if (bottomPanel && bottomPanel.style.height === '40px') {
+                    bottomPanel.style.height = '300px';
+                }
+            }
+
+            const terminalOut = document.getElementById('terminal-output');
+            const fileKey = window.activeFileKey || "1";
+            const fileName = document.querySelector('.editor-tab').innerText.trim() || 'main.py';
+            
+            terminalOut.innerHTML = `
+                <div style="color: #00ff00; margin-bottom: 5px;">Microsoft Windows [Version 10.0.19045.3086]</div>
+                <div style="color: #00ff00; margin-bottom: 15px;">(c) Microsoft Corporation. All rights reserved.</div>
+                <div style="color: #cccccc;">C:\\Users\\Developer\\Project&gt; python ${fileName}</div>
+                <div style="color: #ffaa00; margin-top: 5px;">Starting Execution...</div>
+            `;
+            
+            // Wait 1 second to simulate start
+            await new Promise(r => setTimeout(r, 800));
+            terminalOut.innerHTML += `<div style="color: #aaaaaa;">> Compiling token and AST...</div>`;
+            
+            // Actually hit backend compiler to see if syntax works
+            let currentCode = "";
+            if (window.activeEditorInstance) {
+                currentCode = window.activeEditorInstance.getValue();
+            } else if (window.editor) {
+                currentCode = window.editor.getValue();
+            }
+
+            try {
+                const response = await fetch('/compile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: currentCode })
+                });
+                const result = await response.json();
+                
+                await new Promise(r => setTimeout(r, 600));
+
+                if (result.error) {
+                    terminalOut.innerHTML += `
+                        <div style="color: #ff5555; font-weight: bold; margin-top: 10px;">${result.error}</div>
+                        <div style="color: #ff5555;">${(result.details || []).join('<br>')}</div>
+                        <div style="color: #ff5555; margin-top: 5px;">Process exited with code 1.</div>
+                    `;
+                } else {
+                    // Extract PRINT instructions from IR or Assembly. 
+                    // Let's pretend we execute some code
+                    terminalOut.innerHTML += `<div style="color: #aaaaaa;">> Code compilation valid (0 errors).</div>`;
+                    terminalOut.innerHTML += `<div style="color: #cccccc; margin-top: 10px;">--------- OUTPUT ---------</div>`;
+                    
+                    // Simple simulation based on code for variables
+                    let printedOut = "";
+                    let irText = (result.ir && Array.isArray(result.ir)) ? result.ir.join('\n') : (result.ir || "");
+                    if (irText.includes("PRINT")) {
+                        const prints = irText.split('\n').filter(line => line.includes('PRINT'));
+                        prints.forEach(p => {
+                            printedOut += `<div style="color: #ffffff;">${p.replace('PRINT', 'Printed:').trim()}</div>`;
+                        });
+                    } else {
+                        printedOut += `<div style="color: #cccccc; font-style: italic;">(Process finished without output)</div>`;
+                    }
+                    
+                    terminalOut.innerHTML += printedOut;
+                    terminalOut.innerHTML += `<div style="color: #cccccc; margin-top: 10px;">--------------------------</div>`;
+                    terminalOut.innerHTML += `<div style="color: #00ff00; margin-top: 10px;">Process exited with code 0.</div>`;
+                }
+            } catch(e) {
+                terminalOut.innerHTML += `<div style="color: #ff5555; margin-top: 10px;">Failed to execute: ${e.message}</div>`;
+            }
+            
+            terminalOut.innerHTML += `<div style="color: #cccccc; margin-top: 10px;">C:\\Users\\Developer\\Project&gt; <span class="blink">_</span></div>`;
+        }
+    </script>
+    <style>
+        .blink { animation: blinker 1s linear infinite; font-weight: bold; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
 </body>
 </html>

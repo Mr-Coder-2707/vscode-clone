@@ -19,19 +19,19 @@ export const themes = {
     // ... add more themes as needed
 };
 const defaultExamples = {
-    "1": { name: "1. عمليات حسابية", code: "a = 5 + 3\nb = 10 - 2\nc = a * b" },
-    "2": { name: "2. المتغيرات", code: "x = 7\ny = x + 5\nz = y * x" },
-    "3": { name: "3. if-else البسيطة", code: "x = 10\n\nif x > 5:\n    y = x + 1\nelse:\n    y = x * 2" },
-    "4": { name: "4. nested if", code: "x = 10\ny = 5\n\nif x > 5:\n    if y < 10:\n        z = x + y\n    else:\n        z = x - y\nelse:\n    z = 0" },
+    "1": { name: "1. Simple Arithmetic", code: "a = 5 + 3\nb = 10 - 2\nc = a * b" },
+    "2": { name: "2. Variables", code: "x = 7\ny = x + 5\nz = y * x" },
+    "3": { name: "3. Simple if-else", code: "x = 10\n\nif x > 5:\n    y = x + 1\nelse:\n    y = x * 2" },
+    "4": { name: "4. Nested if", code: "x = 10\ny = 5\n\nif x > 5:\n    if y < 10:\n        z = x + y\n    else:\n        z = x - y\nelse:\n    z = 0" },
     "5": { name: "5. Semantic Error", code: "x = 5\ny = x + z   # Error" },
-    "6": { name: "10. حساب فاتورة", code: "price = 100\ndiscount = 20\n\nfinal = price - discount\n\nif final > 50:\n    tax = final * 2\nelse:\n    tax = final + 5\n\ntotal = final + tax" },
-    "7": { name: "11. Demo كامل", code: "a = 5\nb = 10\nc = a + b * 2\n\nif c > 20:\n    d = c - 5\n    if d > 10:\n        e = d * 2\n    else:\n        e = d + 3\nelse:\n    d = c + 5\n    e = d - 2\n\nresult = e + a" }
+    "6": { name: "6. Calculate Invoice", code: "price = 100\ndiscount = 20\n\nfinal = price - discount\n\nif final > 50:\n    tax = final * 2\nelse:\n    tax = final + 5\n\ntotal = final + tax" },
+    "7": { name: "7. Full Demo", code: "a = 5\nb = 10\nc = a + b * 2\n\nif c > 20:\n    d = c - 5\n    if d > 10:\n        e = d * 2\n    else:\n        e = d + 3\nelse:\n    d = c + 5\n    e = d - 2\n\nresult = e + a" }
 };
 let examples = {};
 let activeFileKey = null;
 let newFileCounter = 1;
 try {
-    const savedExamples = localStorage.getItem('vsc_examples');
+    const savedExamples = localStorage.getItem('vsc_examples_v2');
     if (savedExamples) {
         examples = JSON.parse(savedExamples);
     }
@@ -46,7 +46,7 @@ function saveExamples() {
     if (activeFileKey && examples[activeFileKey] && window.editor) {
         examples[activeFileKey].code = window.editor.getValue();
     }
-    localStorage.setItem('vsc_examples', JSON.stringify(examples));
+    localStorage.setItem('vsc_examples_v2', JSON.stringify(examples));
 }
 export function changeTheme(themeName) {
     const selectedTheme = themes[themeName];

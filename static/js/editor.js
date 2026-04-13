@@ -300,19 +300,19 @@
         });
 
         const defaultExamples = {
-            "1": { name: "1. ╪╣┘à┘ä┘è╪º╪¬ ╪¡╪│╪º╪¿┘è╪⌐", code: "a = 5 + 3\nb = 10 - 2\nc = a * b" },
-            "2": { name: "2. ╪º┘ä┘à╪¬╪║┘è╪▒╪º╪¬", code: "x = 7\ny = x + 5\nz = y * x" },
-            "3": { name: "3. if-else ╪º┘ä╪¿╪│┘è╪╖╪⌐", code: "x = 10\n\nif x > 5:\n    y = x + 1\nelse:\n    y = x * 2" },
-            "4": { name: "4. nested if", code: "x = 10\ny = 5\n\nif x > 5:\n    if y < 10:\n        z = x + y\n    else:\n        z = x - y\nelse:\n    z = 0" },
+            "1": { name: "1. Simple Arithmetic", code: "a = 5 + 3\nb = 10 - 2\nc = a * b" },
+            "2": { name: "2. Variables", code: "x = 7\ny = x + 5\nz = y * x" },
+            "3": { name: "3. Simple if-else", code: "x = 10\n\nif x > 5:\n    y = x + 1\nelse:\n    y = x * 2" },
+            "4": { name: "4. Nested if", code: "x = 10\ny = 5\n\nif x > 5:\n    if y < 10:\n        z = x + y\n    else:\n        z = x - y\nelse:\n    z = 0" },
             "5": { name: "5. Semantic Error", code: "x = 5\ny = x + z   # Error" },
-            "6": { name: "10. ╪¡╪│╪º╪¿ ┘ü╪º╪¬┘ê╪▒╪⌐", code: "price = 100\ndiscount = 20\n\nfinal = price - discount\n\nif final > 50:\n    tax = final * 2\nelse:\n    tax = final + 5\n\ntotal = final + tax" },
-            "7": { name: "11. Demo ┘â╪º┘à┘ä", code: "a = 5\nb = 10\nc = a + b * 2\n\nif c > 20:\n    d = c - 5\n    if d > 10:\n        e = d * 2\n    else:\n        e = d + 3\nelse:\n    d = c + 5\n    e = d - 2\n\nresult = e + a" }
+            "6": { name: "6. Calculate Invoice", code: "price = 100\ndiscount = 20\n\nfinal = price - discount\n\nif final > 50:\n    tax = final * 2\nelse:\n    tax = final + 5\n\ntotal = final + tax" },
+            "7": { name: "7. Full Demo", code: "a = 5\nb = 10\nc = a + b * 2\n\nif c > 20:\n    d = c - 5\n    if d > 10:\n        e = d * 2\n    else:\n        e = d + 3\nelse:\n    d = c + 5\n    e = d - 2\n\nresult = e + a" }
         };
 
         // Load examples from localStorage if available, otherwise use defaults
         let examples = {};
         try {
-            const savedExamples = localStorage.getItem('vsc_examples');
+            const savedExamples = localStorage.getItem('vsc_examples_v2');
             if (savedExamples) {
                 examples = JSON.parse(savedExamples);
             } else {
@@ -326,10 +326,11 @@
             if (activeFileKey && examples[activeFileKey] && editor) {
                 examples[activeFileKey].code = editor.getValue();
             }
-            localStorage.setItem('vsc_examples', JSON.stringify(examples));
+            localStorage.setItem('vsc_examples_v2', JSON.stringify(examples));
         }
 
         let editor;
+        window.activeEditorInstance = null; // Expose to window for external access
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
         require(['vs/editor/editor.main'], function() {
             const initialThemeIdentifier = savedTheme || 'vs-dark';
@@ -340,6 +341,7 @@
                 language: 'python', theme: baseTheme, automaticLayout: true,
                 fontSize: 14, fontFamily: "'Courier New', Consolas, monospace"
             });
+            window.activeEditorInstance = editor; // Add global context
 
             // Re-apply the loaded theme now that the editor is ready
             changeTheme(initialThemeIdentifier);
@@ -403,16 +405,29 @@
         let newFileCounter = 1;
 
         // Create new file when double clicking empty space in sidebar
-        document.querySelector('.sidebar-section').addEventListener('dblclick', (e) => {
-            if (e.target.classList.contains('sidebar-section') || e.target.classList.contains('file-list')) {
-                const newKey = 'new_' + Date.now();
-                examples[newKey] = { name: `Untitled-${newFileCounter++}.py`, code: '' };
-                saveExamples();
-                renderList();
-                loadExample(newKey, document.getElementById('file-item-' + newKey));
-                startRename(newKey);
-            }
-        });
+        const mainSidebar = document.getElementById('sidebar');
+        if (mainSidebar) {
+            mainSidebar.addEventListener('dblclick', (e) => {
+                // Only create file if explorer is active or we are generally in the sidebar
+                const isItem = e.target.closest('li') || e.target.tagName.toLowerCase() === 'input';
+                // Also ignore clicks on sidebar headers/titles to avoid accidental creation
+                const isTitle = e.target.classList.contains('sidebar-title') || e.target.classList.contains('section-header') || e.target.closest('.sidebar-title') || e.target.closest('.section-header');
+                
+                if (!isItem && !isTitle) {
+                    // Automatically switch to explorer pane if not active
+                    if (typeof switchSidebar === 'function') {
+                        switchSidebar('explorer', document.querySelector('.activity-icon[title="Explorer"]'));
+                    }
+                    
+                    const newKey = 'new_' + Date.now();
+                    examples[newKey] = { name: `Untitled-${newFileCounter++}.py`, code: '' };
+                    saveExamples();
+                    renderList();
+                    loadExample(newKey, document.getElementById('file-item-' + newKey));
+                    startRename(newKey);
+                }
+            });
+        }
 
         document.addEventListener('click', (e) => {
             const contextMenu = document.getElementById('context-menu');
@@ -425,21 +440,80 @@
             if (activeKeyForMenu) startRename(activeKeyForMenu);
         };
         
+        function showVscConfirm(message, confirmText = 'Delete') {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:999999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;user-select:none;';
+                
+                const dialog = document.createElement('div');
+                dialog.style.cssText = 'background:#252526;border:1px solid #454545;box-shadow:0 4px 20px rgba(0,0,0,0.5);width:450px;max-width:90vw;display:flex;flex-direction:column;border-radius:4px;';
+                
+                const content = document.createElement('div');
+                content.style.cssText = 'padding:16px 20px;color:#cccccc;font-size:13px;display:flex;align-items:center;gap:10px;';
+                
+                const iconInfo = document.createElement('span');
+                iconInfo.className = 'material-icons-round';
+                iconInfo.textContent = 'warning';
+                iconInfo.style.cssText = 'color:#e2c08d;font-size:24px;';
+                
+                const msgSpan = document.createElement('span');
+                msgSpan.textContent = message;
+                
+                content.appendChild(iconInfo);
+                content.appendChild(msgSpan);
+                
+                const actions = document.createElement('div');
+                actions.style.cssText = 'padding:10px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #2d2d2d;';
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.textContent = confirmText;
+                confirmBtn.style.cssText = 'background:#007fd4;color:white;border:none;padding:5px 14px;border-radius:2px;cursor:pointer;font-size:13px;';
+                confirmBtn.onmouseenter = () => confirmBtn.style.background = '#006eb5';
+                confirmBtn.onmouseleave = () => confirmBtn.style.background = '#007fd4';
+                confirmBtn.onclick = () => {
+                    document.body.removeChild(overlay);
+                    resolve(true);
+                };
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.style.cssText = 'background:#3c3c3c;color:white;border:none;padding:5px 14px;border-radius:2px;cursor:pointer;font-size:13px;';
+                cancelBtn.onmouseenter = () => cancelBtn.style.background = '#4d4d4d';
+                cancelBtn.onmouseleave = () => cancelBtn.style.background = '#3c3c3c';
+                cancelBtn.onclick = () => {
+                    document.body.removeChild(overlay);
+                    resolve(false);
+                };
+                
+                actions.appendChild(confirmBtn);
+                actions.appendChild(cancelBtn);
+                
+                dialog.appendChild(content);
+                dialog.appendChild(actions);
+                overlay.appendChild(dialog);
+                document.body.appendChild(overlay);
+
+                // Quick blur fix for editor if desired
+            });
+        }
+
         document.getElementById('menu-delete').onclick = (e) => {
             if (activeKeyForMenu) {
-                if (confirm('Are you sure you want to delete \'' + examples[activeKeyForMenu].name + '\'?')) {
-                    delete examples[activeKeyForMenu];
-                    saveExamples();
-                    renderList();
-                    if (Object.keys(examples).length > 0) {
-                        loadExample(Object.keys(examples)[0]);
-                    } else {
-                        activeFileKey = null;
-                        if (editor) editor.setValue('');
-                        const editorTabs = document.querySelectorAll('.editor-tab');
-                        if (editorTabs[0]) editorTabs[0].innerHTML = `<span class="material-icons-round" style="color: #4B8BBE;">code</span> Untitled`;
+                showVscConfirm('Are you sure you want to delete \'' + examples[activeKeyForMenu].name + '\'?', 'Delete').then((confirmed) => {
+                    if (confirmed) {
+                        delete examples[activeKeyForMenu];
+                        saveExamples();
+                        renderList();
+                        if (Object.keys(examples).length > 0) {
+                            loadExample(Object.keys(examples)[0]);
+                        } else {
+                            activeFileKey = null;
+                            if (editor) editor.setValue('');
+                            const editorTabs = document.querySelectorAll('.editor-tab');
+                            if (editorTabs[0]) editorTabs[0].innerHTML = `<span class="material-icons-round" style="color: #4B8BBE;">code</span> Untitled`;
+                        }
                     }
-                }
+                });
             }
         };
 
@@ -568,7 +642,7 @@
 
         async function compileCode() {
             document.getElementById('compilation-status').innerText = "Compiling...";
-            updatePanelContent('output', '> Running Pipeline...');
+            updatePanelContent('output', '<div style="color:var(--vsc-accent); display:flex; align-items:center; gap:8px;"><span class="material-icons-round" style="animation: spin 1s linear infinite;">sync</span> Running Pipeline...</div>');
             try {
                 const response = await fetch('/compile', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -577,36 +651,130 @@
                 const result = await response.json();
                 
                 if (result.error) {
-                    updatePanelContent('tokens', `<span style="color:#f48771">${result.error}:<br>${result.details.join('<br>')}</span>`);
+                    updatePanelContent('tokens', `<div style="background:rgba(244,135,113,0.1); border-left:4px solid #f48771; padding:15px; border-radius:4px; font-family:'Segoe UI', sans-serif;">
+                        <div style="color:#f48771; font-weight:bold; font-size:16px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                            <span class="material-icons-round">error_outline</span> ${result.error}
+                        </div>
+                        <div style="color:var(--vsc-text); opacity:0.9; margin-left:26px; white-space:pre-wrap;">${result.details.join('<br>')}</div>
+                    </div>`);
                     document.getElementById('compilation-status').innerText = "Error";
                 } else {
                     document.getElementById('compilation-status').innerText = "Success";
                     
-                    const tHtml = result.tokens.map(t => `<span style="color:#ce9178">Token</span>(${t.type}, "<span style="color:#4ec9b0">${t.value}</span>") <span style="color:#6a9955">// L${t.line}</span>`).join('<br>');
+                    // Graphical Tokens UI
+                    let tHtml = `<div style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; text-align:left; color:var(--vsc-text); font-family:Consolas, monospace; font-size:13px; min-width:400px;">
+                        <thead>
+                            <tr style="border-bottom:1px solid var(--vsc-border); color:var(--vsc-sidebar-header); font-family:'Segoe UI', sans-serif; font-size:12px; text-transform:uppercase;">
+                                <th style="padding:10px 15px; width:60px;">Line</th>
+                                <th style="padding:10px 15px; width:150px;">Token Type</th>
+                                <th style="padding:10px 15px;">Lexeme Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    
+                    result.tokens.forEach(t => {
+                        let typeColor = "#569cd6";
+                        let bgAlpha = "0.1";
+                        if (t.type === "IDENTIFIER") typeColor = "#9cdcfe";
+                        else if (t.type === "NUMBER") { typeColor = "#b5cea8"; bgAlpha = "0.15"; }
+                        else if (t.type === "STRING") { typeColor = "#ce9178"; bgAlpha = "0.15"; }
+                        else if (t.type === "OPERATOR" || t.type === "PUNCTUATION") typeColor = "#d4d4d4";
+                        else if (t.type === "KEYWORD") typeColor = "#c586c0";
+
+                        tHtml += `<tr style="border-bottom:1px solid rgba(128,128,128,0.1); transition:background 0.2s;" onmouseover="this.style.background='var(--vsc-highlight)'" onmouseout="this.style.background='transparent'">
+                            <td style="padding:8px 15px; color:#858585;">${t.line}</td>
+                            <td style="padding:8px 15px;">
+                                <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px; color:${typeColor}; border:1px solid rgba(255,255,255,0.1); font-size:12px;">${t.type}</span>
+                            </td>
+                            <td style="padding:8px 15px; color:#ce9178; font-weight:bold; letter-spacing:0.5px;">${t.value || " "}</td>
+                        </tr>`;
+                    });
+                    tHtml += `</tbody></table></div>`;
                     updatePanelContent('tokens', tHtml);
                     
-                    updatePanelContent('ast', buildTreeHtml(result.ast));
-                    updatePanelContent('semantic', `<span style="color:#89d185">Γ£ô ${result.semantic}</span>`);
-                    updatePanelContent('ir', result.ir.join('<br>'));
-                    updatePanelContent('assembly', result.assembly.replace(/\n/g, '<br>'));
+                    updatePanelContent('ast', `<div style="padding:10px 15px; background:var(--vsc-editor-bg); border-radius:4px; border:1px solid var(--vsc-border); overflow-x:auto;"><ul class="tree">${buildTreeHtml(result.ast)}</ul></div>`);
                     
-                    updatePanelContent('output', '<span style="color:#89d185">[Success] Pipeline finished successfully.</span>');
+                    updatePanelContent('semantic', `<div style="display:flex; align-items:center; gap:12px; padding:15px 20px; background:rgba(39, 201, 63, 0.08); border-left:4px solid #27c93f; border-radius:4px; font-family:'Segoe UI', sans-serif;">
+                        <span class="material-icons-round" style="color:#27c93f; font-size:28px;">verified</span>
+                        <div>
+                            <div style="color:#27c93f; font-weight:600; font-size:15px; margin-bottom:2px;">Semantic Analysis OK</div>
+                            <div style="color:var(--vsc-text); opacity:0.8; font-size:13px; font-family:Consolas, monospace;">${result.semantic.replace('Γ£ô', '').trim()}</div>
+                        </div>
+                    </div>`);
+                    
+                    // Graphical IR
+                    const irHtml = result.ir.map((inst, index) => {
+                        let parts = inst.split(' ');
+                        const op = parts[0];
+                        const args = parts.slice(1).join(' ')
+                            .replace(/(_\d+|t\d+)/g, '<span style="color:#4fc1ff;">$1</span>')
+                            .replace(/\b(\d+)\b/g, '<span style="color:#b5cea8;">$1</span>');
+                        return `<div style="display:flex; align-items:center; gap:15px; padding:4px 10px; font-family:Consolas, monospace; border-bottom:1px dashed rgba(128,128,128,0.1); cursor:default;" onmouseover="this.style.background='var(--vsc-highlight)'" onmouseout="this.style.background='transparent'">
+                            <span style="color:#858585; width:24px; text-align:right; font-size:11px; opacity:0.7;">${("0"+(index+1)).slice(-2)}</span>
+                            <span style="color:#c586c0; font-weight:bold; width:80px; text-transform:uppercase;">${op}</span>
+                            <span style="color:#9cdcfe;">${args}</span>
+                        </div>`;
+                    }).join('');
+                    updatePanelContent('ir', `<div style="background:var(--vsc-editor-bg); border:1px solid var(--vsc-border); border-radius:4px; padding:10px 0; overflow-x:auto;">${irHtml || '<div style="padding:0 20px; color:#858585;">No Instructions</div>'}</div>`);
+                    
+                    // Assembly with syntax highlight
+                    const asmHtml = result.assembly.split('\n').map(line => {
+                        let isLabel = line.trim().endsWith(':');
+                        let content = line;
+                        let comment = '';
+                        if (line.includes(';')) {
+                            let parts = line.split(';');
+                            content = parts[0];
+                            comment = `;${parts[1]}`;
+                        }
+                        
+                        if (!isLabel) {
+                            content = content
+                                .replace(/\b(mov|add|sub|jmp|je|jne|cmp|call|ret|push|pop|imul|idiv|lea)\b/gi, '<span style="color:#c586c0; font-weight:bold;">$1</span>')
+                                .replace(/\b(eax|ebx|ecx|edx|esp|ebp|edi|esi|al|ah|bl|bh|cl|ch|dl|dh)\b/gi, '<span style="color:#9cdcfe;">$1</span>')
+                                .replace(/\b(\d+)\b/g, '<span style="color:#b5cea8;">$1</span>');
+                        }
+
+                        let color = isLabel ? '#dcdcaa' : 'var(--vsc-text)';
+                        let marginLeft = isLabel ? '10px' : '40px';
+                        let htmlPart = `<span style="color:${color}; font-weight:${isLabel ? 'bold' : 'normal'};">${content}</span>`;
+                        if (comment) htmlPart += `<span style="color:#6a9955; margin-left:20px; font-style:italic;">${comment}</span>`;
+                        
+                        return `<div style="margin-left:${marginLeft}; padding:2px 10px; font-family:Consolas, monospace; cursor:default; border-radius:2px;" onmouseover="this.style.background='var(--vsc-highlight)'" onmouseout="this.style.background='transparent'">${htmlPart}</div>`;
+                    }).join('');
+                    updatePanelContent('assembly', `<div style="background:var(--vsc-editor-bg); border:1px solid var(--vsc-border); border-radius:4px; padding:15px 0; white-space:pre-wrap; overflow-x:auto;">${asmHtml}</div>`);
+                    
+                    updatePanelContent('output', `<div style="display:flex; align-items:center; gap:8px; padding:10px; background:rgba(39, 201, 63, 0.05); color:#89d185; border:1px solid rgba(39, 201, 63, 0.2); border-radius:4px; font-family:'Segoe UI', sans-serif;">
+                        <span class="material-icons-round">task_alt</span> Pipeline finished successfully.
+                    </div>`);
                 }
             } catch (err) {
-                updatePanelContent('output', `Failed: ${err.message}`);
+                updatePanelContent('output', `<div style="color:#f48771; display:flex; align-items:center; gap:8px;"><span class="material-icons-round">error</span> Failed: ${err.message}</div>`);
             }
         }
 
         function buildTreeHtml(node) {
             if (!node) return '';
-            let html = `<li><span style="color:#dcdcaa">${node.name}</span>`;
+            let isLeaf = !node.children || node.children.length === 0;
+            let icon = isLeaf ? 'description' : 'folder_open';
+            let iconColor = isLeaf ? '#519aba' : '#dcb67a';
+            
+            let html = `<li style="padding: 2px 0;">
+                <div style="display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onmouseover="this.style.background='var(--vsc-highlight)'; this.style.borderRadius='4px'; this.style.paddingRight='8px'" onmouseout="this.style.background='transparent'">
+                    <span class="material-icons-round" style="font-size:16px; color:${iconColor};">${icon}</span>
+                    <span style="color:var(--vsc-text); font-weight:${isLeaf ? 'normal' : '600'}; font-size:13px;">${node.name}</span>
+                </div>`;
+                
             if (node.children?.length > 0) {
-                html += '<ul class="tree">';
-                for (let child of node.children) html += buildTreeHtml(child);
+                html += '<ul class="tree" style="margin-top:2px;">';
+                for (let child of node.children) {
+                    html += buildTreeHtml(child);
+                }
                 html += '</ul>';
             }
             html += '</li>';
-            return `<ul class="tree">${html}</ul>`;
+            return html;
         }
 
         // Service Worker Registration for PWA
