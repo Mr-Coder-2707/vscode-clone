@@ -1,10 +1,5 @@
 // main.js
 
-// إذا كان المستخدم قد دخل المحرر مسبقاً، تحويله تلقائياً
-if (localStorage.getItem('skipLanding') === 'true') {
-    window.location.href = '/editor';
-}
-
 tailwind.config = {
     theme: {
         extend: {

@@ -26,13 +26,13 @@ class IRGenerator(NodeVisitor):
 
     def visit_Assign(self, node):
         expr_val = self.visit(node.expr)
-        self.instructions.append(f"{node.identifier} = {expr_val}")
+        self.instructions.append(("ASSIGN", node.identifier, expr_val))
 
     def visit_BinOp(self, node):
         left_val = self.visit(node.left)
         right_val = self.visit(node.right)
         temp = self.new_temp()
-        self.instructions.append(f"{temp} = {left_val} {node.op} {right_val}")
+        self.instructions.append(("BINOP", temp, left_val, node.op, right_val))
         return temp
 
     def visit_Identifier(self, node):
@@ -49,7 +49,7 @@ class IRGenerator(NodeVisitor):
 
     def visit_PrintStatement(self, node):
         expr_val = self.visit(node.expr)
-        self.instructions.append(f"PRINT {expr_val}")
+        self.instructions.append(("PRINT", expr_val))
         return None
 
     def visit_WhileBlock(self, node):
@@ -57,15 +57,15 @@ class IRGenerator(NodeVisitor):
         label_body = self.new_label()
         label_end = self.new_label()
         
-        self.instructions.append(f"{label_start}:")
+        self.instructions.append(("LABEL", label_start))
         cond_val = self.visit(node.condition)
-        self.instructions.append(f"IF {cond_val} GOTO {label_body}")
-        self.instructions.append(f"GOTO {label_end}")
-        self.instructions.append(f"{label_body}:")
+        self.instructions.append(("IF_GOTO", cond_val, label_body))
+        self.instructions.append(("GOTO", label_end))
+        self.instructions.append(("LABEL", label_body))
         for stmt in node.body:
             self.visit(stmt)
-        self.instructions.append(f"GOTO {label_start}")
-        self.instructions.append(f"{label_end}:")
+        self.instructions.append(("GOTO", label_start))
+        self.instructions.append(("LABEL", label_end))
         return None
 
     def visit_IfBlock(self, node):
@@ -73,12 +73,13 @@ class IRGenerator(NodeVisitor):
         label_true = self.new_label()
         label_end = self.new_label()
         
-        self.instructions.append(f"IF {cond_val} GOTO {label_true}")
+        self.instructions.append(("IF_GOTO", cond_val, label_true))
         if node.else_body:
             for stmt in node.else_body:
                 self.visit(stmt)
-        self.instructions.append(f"GOTO {label_end}")
-        self.instructions.append(f"{label_true}:")
+        self.instructions.append(("GOTO", label_end))
+        self.instructions.append(("LABEL", label_true))
         for stmt in node.if_body:
             self.visit(stmt)
-        self.instructions.append(f"{label_end}:")
+        self.instructions.append(("LABEL", label_end))
+

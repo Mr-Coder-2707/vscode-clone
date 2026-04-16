@@ -30,7 +30,7 @@
                     <a href="#" class="text-vsc-text hover:text-white transition">Docs</a>
                 </div>
                 <div>
-                    <a href="/editor" onclick="localStorage.setItem('skipLanding', 'true')" class="bg-vsc-blue hover:bg-vsc-blueHover text-white px-4 py-1.5 rounded-sm text-sm font-semibold transition flex items-center gap-2">
+                    <a href="/editor" class="bg-vsc-blue hover:bg-vsc-blueHover text-white px-4 py-1.5 rounded-sm text-sm font-semibold transition flex items-center gap-2">
                         <span class="material-icons-round text-base">code</span>
                         Open Editor
                     </a>
@@ -49,7 +49,7 @@
         </p>
         
         <div class="flex flex-col sm:flex-row gap-4 mb-16">
-            <a href="/editor" onclick="localStorage.setItem('skipLanding', 'true')" class="bg-vsc-blue hover:bg-vsc-blueHover text-white px-8 py-3 rounded text-lg font-bold transition flex items-center justify-center shadow-lg gap-2">
+            <a href="/editor" class="bg-vsc-blue hover:bg-vsc-blueHover text-white px-8 py-3 rounded text-lg font-bold transition flex items-center justify-center shadow-lg gap-2">
                 <span class="material-icons-round">play_arrow</span>
                 Start Coding Now
             </a>
@@ -109,7 +109,7 @@ app = Flask(__name__)<br><br>
             </div>
             
             <!-- Engineers Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 
                 <!-- Engineer 1 -->
                 <div class="engineer-card bg-[#1e1e1e] border border-vsc-border rounded-lg p-6 text-center relative overflow-hidden">
@@ -118,9 +118,9 @@ app = Flask(__name__)<br><br>
                         <img src="/images/mahmoud.jpeg" alt="Mahmoud" loading="lazy" class="w-full h-full object-cover">
                     </div>
                     <h3 class="text-lg font-bold text-white mb-1">Mahmoud Sabry Elkhawas</h3>
-                    <p class="text-vsc-blue text-xs font-semibold mb-3">Lead Software Engineer</p>
+                    <p class="text-vsc-blue text-xs font-semibold mb-3">Lead Software Engineer & Architect</p>
                     <p class="text-gray-400 text-xs">
-                        Led the core development, architectural design, and integrated the ecosystem to ensure top-notch quality.
+                        Led the core development, architectural design, Semantic Analysis, and Intermediate Representation (IR).
                     </p>
                 </div>
 
@@ -133,7 +133,7 @@ app = Flask(__name__)<br><br>
                     <h3 class="text-lg font-bold text-white mb-1">Abdelrahman Zakaria</h3>
                     <p class="text-[#27c93f] text-xs font-semibold mb-3">Compiler Engineer</p>
                     <p class="text-gray-400 text-xs">
-                        Responsible for Lexical & Syntax Analysis and ensuring accurate tokenization and parsing.
+                        Responsible for Lexical & Syntax Analysis, Code Generation (Assembly), and ensuring accurate parsing.
                     </p>
                 </div>
 
@@ -147,19 +147,6 @@ app = Flask(__name__)<br><br>
                     <p class="text-[#ffbd2e] text-xs font-semibold mb-3">Frontend Developer</p>
                     <p class="text-gray-400 text-xs">
                         Developed the seamless experimental web interfaces and the user-friendly VSC environment.
-                    </p>
-                </div>
-
-                <!-- Engineer 4 -->
-                <div class="engineer-card bg-[#1e1e1e] border border-vsc-border rounded-lg p-6 text-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-full h-1 bg-[#ff5f56]"></div>
-                    <div class="w-20 h-20 bg-[#3c3c3c] rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-[#252526] shadow-sm overflow-hidden">
-                        <img src="/images/mohamed.jpeg" alt="Mohamed Elghareeb" loading="lazy" class="w-full h-full object-cover">
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-1">Mohamed Elghareeb</h3>
-                    <p class="text-[#ff5f56] text-xs font-semibold mb-3">Compiler Architect</p>
-                    <p class="text-gray-400 text-xs">
-                        Handled Semantic Analysis and intermediate code generation for maximum system efficiency.
                     </p>
                 </div>
 

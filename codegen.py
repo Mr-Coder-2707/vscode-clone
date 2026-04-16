@@ -9,16 +9,14 @@ class CodeGenerator:
         self.asm.append("_start:")
         
         for inst in self.ir_instructions:
-            parts = inst.split()
-            if len(parts) == 3 and parts[1] == '=':
-                # Assignment
-                self.asm.append(f"    MOV [{parts[0]}], {parts[2]}")
-            elif len(parts) == 5 and parts[1] == '=':
-                # BinOp
-                dest = parts[0]
-                left = parts[2]
-                op = parts[3]
-                right = parts[4]
+            op_type = inst[0]
+            
+            if op_type == "ASSIGN":
+                _, dest, val = inst
+                self.asm.append(f"    MOV [{dest}], {val}")
+                
+            elif op_type == "BINOP":
+                _, dest, left, op, right = inst
                 self.asm.append(f"    MOV EAX, {left}")
                 if op == '+':
                     self.asm.append(f"    ADD EAX, {right}")
@@ -30,23 +28,51 @@ class CodeGenerator:
                     self.asm.append(f"    MOV EBX, {right}")
                     self.asm.append(f"    CDQ")
                     self.asm.append(f"    IDIV EBX")
+                elif op == '==':
+                    self.asm.append(f"    CMP EAX, {right}")
+                    self.asm.append(f"    SETE AL")
+                    self.asm.append(f"    MOVZX EAX, AL")
+                elif op == '!=':
+                    self.asm.append(f"    CMP EAX, {right}")
+                    self.asm.append(f"    SETNE AL")
+                    self.asm.append(f"    MOVZX EAX, AL")
+                elif op == '>':
+                    self.asm.append(f"    CMP EAX, {right}")
+                    self.asm.append(f"    SETG AL")
+                    self.asm.append(f"    MOVZX EAX, AL")
+                elif op == '<':
+                    self.asm.append(f"    CMP EAX, {right}")
+                    self.asm.append(f"    SETL AL")
+                    self.asm.append(f"    MOVZX EAX, AL")
+                elif op == '>=':
+                    self.asm.append(f"    CMP EAX, {right}")
+                    self.asm.append(f"    SETGE AL")
+                    self.asm.append(f"    MOVZX EAX, AL")
+                elif op == '<=':
+                    self.asm.append(f"    CMP EAX, {right}")
+                    self.asm.append(f"    SETLE AL")
+                    self.asm.append(f"    MOVZX EAX, AL")
                 self.asm.append(f"    MOV [{dest}], EAX")
-            elif inst.startswith("IF "):
-                # IF t1 GOTO L1
-                cond = parts[1] # usually a temp holding 0 or 1, or comparison
-                label = parts[3]
+                
+            elif op_type == "IF_GOTO":
+                _, cond, label = inst
                 self.asm.append(f"    CMP {cond}, 1")
                 self.asm.append(f"    JE {label}")
-            elif inst.startswith("PRINT "):
-                val = parts[1]
+                
+            elif op_type == "PRINT":
+                _, val = inst
                 self.asm.append(f"    ; PRINT {val}")
                 self.asm.append(f"    PUSH {val}")
                 self.asm.append(f"    CALL print_func")
                 self.asm.append(f"    ADD ESP, 4")
-            elif inst.startswith("GOTO "):
-                self.asm.append(f"    JMP {parts[1]}")
-            elif inst.endswith(":"):
-                self.asm.append(inst)
+                
+            elif op_type == "GOTO":
+                _, label = inst
+                self.asm.append(f"    JMP {label}")
+                
+            elif op_type == "LABEL":
+                _, label = inst
+                self.asm.append(f"{label}:")
 
         self.asm.append("    ; Exit program")
         self.asm.append("    MOV EAX, 1")
