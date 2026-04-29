@@ -39,7 +39,6 @@
                 </div>
                 <div class="hidden md:flex space-x-6 text-sm font-semibold">
                     <a href="#" class="text-vsc-text hover:text-white transition">Features</a>
-                    <a href="#team" class="text-vsc-text hover:text-white transition">Team</a>
                     <a href="/editor" class="text-vsc-text hover:text-white transition">Editor</a>
                     <a href="#" class="text-vsc-text hover:text-white transition">Docs</a>
                 </div>
@@ -66,10 +65,6 @@
             <a href="/editor" class="bg-vsc-blue hover:bg-vsc-blueHover text-white px-8 py-3 rounded text-lg font-bold transition flex items-center justify-center shadow-lg gap-2">
                 <span class="material-icons-round">play_arrow</span>
                 Start Coding Now
-            </a>
-            <a href="#team" class="bg-[#3c3c3c] hover:bg-[#4d4d4d] text-white px-8 py-3 rounded text-lg font-bold transition flex items-center justify-center gap-2">
-                <span class="material-icons-round">groups</span>
-                Meet the Team
             </a>
         </div>
 
@@ -109,65 +104,86 @@ app = Flask(__name__)<br><br>
         </div>
     </main>
 
+
     <!-- Team Section -->
-    <section id="team" class="py-20 bg-[#252526] border-t border-vsc-border">
+    <section class="py-16 bg-[#1a1a1a] border-t border-vsc-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14">
-                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
-                    Engineering Team
-                </h2>
-                <p class="mt-4 text-xl text-gray-400">
-                    The brilliant minds behind this integrated platform
-                </p>
-                <div class="mt-2 w-24 h-1 bg-vsc-blue mx-auto rounded"></div>
-            </div>
-            
-            <!-- Engineers Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                
-                <!-- Engineer 1 -->
-                <div class="engineer-card bg-[#1e1e1e] border border-vsc-border rounded-lg p-6 text-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-full h-1 bg-vsc-blue"></div>
-                    <div class="w-20 h-20 bg-[#3c3c3c] rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-[#252526] shadow-sm overflow-hidden">
-                        <img src="/images/mahmoud.jpeg" alt="Mahmoud" loading="lazy" class="w-full h-full object-cover">
+            <h2 class="text-3xl font-bold text-white mb-12 text-center">Meet Our Engineering Team</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Member 1 -->
+                <div class="bg-[#252526] p-6 rounded-lg border border-vsc-border hover:border-vsc-blue transition-all group">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-20 h-20 bg-vsc-blue/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-icons-round text-vsc-blue text-3xl">person</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1" dir="rtl">محمود صبري محمود علي الخواص</h3>
+                        <p class="text-vsc-blue font-semibold text-sm mb-3">Software Engineer</p>
+                        <div class="flex items-center gap-2 text-gray-500 text-xs">
+                            <span class="material-icons-round text-sm">badge</span>
+                            <span>ID: 2303006</span>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-1">Mahmoud Sabry Elkhawas</h3>
-                    <p class="text-vsc-blue text-xs font-semibold mb-3">Lead Software Engineer & Architect</p>
-                    <p class="text-gray-400 text-xs">
-                        Led the core development, architectural design, Semantic Analysis, and Intermediate Representation (IR).
-                    </p>
                 </div>
 
-                <!-- Engineer 2 -->
-                <div class="engineer-card bg-[#1e1e1e] border border-vsc-border rounded-lg p-6 text-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-full h-1 bg-[#27c93f]"></div>
-                    <div class="w-20 h-20 bg-[#3c3c3c] rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-[#252526] shadow-sm overflow-hidden">
-                        <img src="/images/abdelrahman_z.jpeg" alt="Abdelrahman Zakaria" loading="lazy" class="w-full h-full object-cover">
+                <!-- Member 2 -->
+                <div class="bg-[#252526] p-6 rounded-lg border border-vsc-border hover:border-vsc-blue transition-all group">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-20 h-20 bg-vsc-blue/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-icons-round text-vsc-blue text-3xl">person</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1" dir="rtl">عبد الرحمن زكريا احمد محمد</h3>
+                        <p class="text-vsc-blue font-semibold text-sm mb-3">Software Engineer</p>
+                        <div class="flex items-center gap-2 text-gray-500 text-xs">
+                            <span class="material-icons-round text-sm">badge</span>
+                            <span>ID: 2303029</span>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-1">Abdelrahman Zakaria</h3>
-                    <p class="text-[#27c93f] text-xs font-semibold mb-3">Compiler Engineer</p>
-                    <p class="text-gray-400 text-xs">
-                        Responsible for Lexical & Syntax Analysis, Code Generation (Assembly), and ensuring accurate parsing.
-                    </p>
                 </div>
 
-                <!-- Engineer 3 -->
-                <div class="engineer-card bg-[#1e1e1e] border border-vsc-border rounded-lg p-6 text-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-full h-1 bg-[#ffbd2e]"></div>
-                    <div class="w-20 h-20 bg-[#3c3c3c] rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-[#252526] shadow-sm overflow-hidden">
-                        <img src="/images/abdelrahman_a.jpeg" alt="Abdelrahman Adel" loading="lazy" class="w-full h-full object-cover">
+                <!-- Member 3 -->
+                <div class="bg-[#252526] p-6 rounded-lg border border-vsc-border hover:border-vsc-blue transition-all group">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-20 h-20 bg-vsc-blue/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-icons-round text-vsc-blue text-3xl">person</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1" dir="rtl">عبدالرحمن عادل احمد حسن</h3>
+                        <p class="text-vsc-blue font-semibold text-sm mb-3">Software Engineer</p>
+                        <div class="flex items-center gap-2 text-gray-500 text-xs">
+                            <span class="material-icons-round text-sm">badge</span>
+                            <span>ID: 2303015</span>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-1">Abdelrahman Adel</h3>
-                    <p class="text-[#ffbd2e] text-xs font-semibold mb-3">Frontend Developer</p>
-                    <p class="text-gray-400 text-xs">
-                        Developed the seamless experimental web interfaces and the user-friendly VSC environment.
-                    </p>
                 </div>
 
-            </div>
-            
-            <div class="text-center mt-12">
-                
+                <!-- Member 4 -->
+                <div class="bg-[#252526] p-6 rounded-lg border border-vsc-border hover:border-vsc-blue transition-all group">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-20 h-20 bg-vsc-blue/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-icons-round text-vsc-blue text-3xl">person</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1" dir="rtl">اسلام محمد عبد الحليم</h3>
+                        <p class="text-vsc-blue font-semibold text-sm mb-3">Software Engineer</p>
+                        <div class="flex items-center gap-2 text-gray-500 text-xs">
+                            <span class="material-icons-round text-sm">badge</span>
+                            <span>ID: 2303002</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 5 -->
+                <div class="bg-[#252526] p-6 rounded-lg border border-vsc-border hover:border-vsc-blue transition-all group">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-20 h-20 bg-vsc-blue/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-icons-round text-vsc-blue text-3xl">person</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1" dir="rtl">احمد هاني فتحي عفيفي</h3>
+                        <p class="text-vsc-blue font-semibold text-sm mb-3">Software Engineer</p>
+                        <div class="flex items-center gap-2 text-gray-500 text-xs">
+                            <span class="material-icons-round text-sm">badge</span>
+                            <span>ID: 2303173</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
